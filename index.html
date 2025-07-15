@@ -35,10 +35,33 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #085588 0%, #47b7c9 100%);
-            color: white;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            color: #085588;
             padding: 40px 30px;
             text-align: center;
+            position: relative;
+            border-bottom: 3px solid #47b7c9;
+        }
+
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .logo-placeholder {
+            width: 200px;
+            height: 60px;
+            background: rgba(71, 183, 201, 0.1);
+            border: 2px dashed #47b7c9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            color: #47b7c9;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .header h1 {
@@ -474,7 +497,8 @@
 <body>
     <div class="calculator-container">
         <div class="header">
-            <h1>TuaPay ROI Calculator</h1>
+            <img src="TuaPay Logo" alt="TuaPay Logo" class="logo">
+            <h1>ROI Calculator</h1>
             <p>Discover how patient financing can transform your practice revenue</p>
         </div>
 
@@ -928,7 +952,5 @@ Page: ${window.location.href}
             }).format(amount);
         }
     </script>
-</body>
-</html>
 </body>
 </html>
