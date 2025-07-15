@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuaPay ROI Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #47b7c9 0%, #085588 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .calculator-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #085588 0%, #47b7c9 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .inputs-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #085588;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .tooltip {
+            position: relative;
+            margin-left: 8px;
+            cursor: help;
+        }
+
+        .tooltip-icon {
+            width: 20px;
+            height: 20px;
+            background: #47b7c9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background: #333;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 130%;
+            left: 50%;
+            margin-left: -140px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #47b7c9;
+            box-shadow: 0 0 0 4px rgba(71, 183, 201, 0.1);
+            background: white;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            accent-color: #47b7c9;
+        }
+
+        .checkbox-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .teaser-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 3px solid #cddd72;
+            box-shadow: 0 0 20px rgba(205, 221, 114, 0.4), 0 0 40px rgba(205, 221, 114, 0.2);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(205, 221, 114, 0.4), 0 0 40px rgba(205, 221, 114, 0.2);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(205, 221, 114, 0.6), 0 0 60px rgba(205, 221, 114, 0.3);
+            }
+        }
+
+        .teaser-title {
+            font-size: 1.4em;
+            color: #085588;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .teaser-amount {
+            font-size: 3.2em;
+            font-weight: 800;
+            color: #085588;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .teaser-subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .email-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            margin: 0 auto;
+            border: 1px solid #f0f0f0;
+        }
+
+        .email-form h3 {
+            color: #085588;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .email-form p {
+            color: #666;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #47b7c9;
+            box-shadow: 0 0 0 4px rgba(71, 183, 201, 0.1);
+        }
+
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #ff7c33 0%, #e65100 100%);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(255, 124, 51, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .report-section {
+            display: none;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #085588 0%, #47b7c9 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .report-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .report-subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid #47b7c9;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card.primary {
+            border-left-color: #ff7c33;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #085588;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .result-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .benchmark-note {
+            background: linear-gradient(135deg, #cddd72 0%, #a8c948 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 30px 0;
+            font-weight: 600;
+            color: #2d4a22;
+            font-size: 1.1em;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .action-button {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #47b7c9 0%, #085588 100%);
+            color: white;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #ff7c33 0%, #e65100 100%);
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .disclaimer {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            border: 1px solid #e9ecef;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .header p {
+                font-size: 1.1em;
+            }
+
+            .main-content {
+                padding: 30px 20px;
+            }
+
+            .inputs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .teaser-amount {
+                font-size: 2.5em;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <h1>TuaPay ROI Calculator</h1>
+            <p>Discover how patient financing can transform your practice revenue</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="inputs-section">
+                <h2 class="section-title">Tell Us About Your Practice</h2>
+
+                <div class="inputs-grid">
+                    <div class="input-group">
+                        <label class="input-label">
+                            Average Case Value ($)
+                            <div class="tooltip">
+                                <div class="tooltip-icon">?</div>
+                                <div class="tooltip-text">The typical amount you charge per treatment or procedure (e.g., $2,500 for a crown, $8,000 for implants)</div>
+                            </div>
+                        </label>
+                        <input type="number" class="input-field" id="avgCaseValue" placeholder="2500" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Cases Per Month
+                            <div class="tooltip">
+                                <div class="tooltip-icon">?</div>
+                                <div class="tooltip-text">How many patients you typically treat each month across all services</div>
+                            </div>
+                        </label>
+                        <input type="number" class="input-field" id="casesPerMonth" placeholder="50" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Expected Case Acceptance Increase (%)
+                            <div class="tooltip">
+                                <div class="tooltip-icon">?</div>
+                                <div class="tooltip-text">Research shows financing increases case acceptance by 15-40%. How much improvement do you expect?</div>
+                            </div>
+                        </label>
+                        <input type="number" class="input-field" id="acceptanceIncrease" placeholder="25" min="0" max="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            % of Patients Likely to Use Financing
+                            <div class="tooltip">
+                                <div class="tooltip-icon">?</div>
+                                <div class="tooltip-text">Typically 30-60% of patients choose financing when available. What percentage fits your patient base?</div>
+                            </div>
+                        </label>
+                        <input type="number" class="input-field" id="financingUsage" placeholder="40" min="0" max="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Current Payment Timeline (Days)
+                            <div class="tooltip">
+                                <div class="tooltip-icon">?</div>
+                                <div class="tooltip-text">How long it typically takes to receive full payment from patients (including insurance processing)</div>
+                            </div>
+                        </label>
+                        <input type="number" class="input-field" id="paymentTimeline" placeholder="45" min="0">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeCurrentRevenue">
+                    <label for="includeCurrentRevenue">Include cash flow analysis (requires current monthly revenue)</label>
+                </div>
+
+                <div class="input-group hidden" id="currentRevenueGroup">
+                    <label class="input-label">
+                        Current Monthly Revenue ($)
+                        <div class="tooltip">
+                            <div class="tooltip-icon">?</div>
+                            <div class="tooltip-text">Your practice's total monthly revenue for detailed cash flow impact analysis</div>
+                        </div>
+                    </label>
+                    <input type="number" class="input-field" id="currentRevenue" placeholder="125000" min="0">
+                </div>
+            </div>
+
+            <!-- Teaser Section -->
+            <div class="teaser-section" id="teaserSection">
+                <div class="teaser-title">Your Revenue Opportunity</div>
+                <div class="teaser-amount" id="teaserAmount">$0</div>
+                <div class="teaser-subtitle">potential additional monthly revenue with TuaPay</div>
+                
+                <div class="email-form">
+                    <h3>Get Your Complete ROI Analysis</h3>
+                    <p>Enter your details below to unlock your full financial impact report, including break-even timeline and cash flow projections.</p>
+                    
+                    <div class="form-row">
+                        <input type="text" class="email-input" id="firstName" placeholder="First Name" required>
+                        <input type="text" class="email-input" id="lastName" placeholder="Last Name" required>
+                    </div>
+                    
+                    <input type="email" class="email-input" id="email" placeholder="your.email@practice.com" required style="margin-bottom: 15px;">
+                    
+                    <input type="text" class="email-input" id="practiceName" placeholder="Practice Name (Optional)" style="margin-bottom: 20px;">
+                    
+                    <button class="submit-button" onclick="submitForm()">Get My Full ROI Report</button>
+                </div>
+            </div>
+
+            <!-- Full Report Section -->
+            <div class="report-section" id="reportSection">
+                <div class="report-header">
+                    <div class="report-title">Your TuaPay ROI Analysis</div>
+                    <div class="report-subtitle">Personalized financial impact projection for <span id="practiceNameDisplay">your practice</span></div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-card primary">
+                        <div class="result-label">Monthly Revenue Increase</div>
+                        <div class="result-value" id="monthlyIncrease">$0</div>
+                        <div class="result-description">Additional revenue from increased case acceptance</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-label">New Patients Per Month</div>
+                        <div class="result-value" id="newPatients">0</div>
+                        <div class="result-description">Additional patients accepting treatment</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-label">Break-Even Timeline</div>
+                        <div class="result-value" id="breakEven">0 mo</div>
+                        <div class="result-description">Time to recover TuaPay implementation costs</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-label">Payment Acceleration</div>
+                        <div class="result-value" id="paymentSpeed">0 days</div>
+                        <div class="result-description">Faster cash flow vs. current timeline</div>
+                    </div>
+
+                    <div class="result-card hidden" id="cashFlowCard">
+                        <div class="result-label">Monthly Cash Flow Boost</div>
+                        <div class="result-value" id="cashFlowBoost">$0</div>
+                        <div class="result-description">Improved working capital from faster payments</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-label">Annual Revenue Impact</div>
+                        <div class="result-value" id="annualImpact">$0</div>
+                        <div class="result-description">Total additional revenue over 12 months</div>
+                    </div>
+                </div>
+
+                <div class="benchmark-note">
+                    <strong>Industry Insight:</strong> Most practices using TuaPay break even in under 3 months and see 20-35% increases in case acceptance rates.
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-button download-btn" onclick="downloadReport()">
+                        📄 Download Report
+                    </button>
+                    <button class="action-button cta-btn" onclick="contactSpecialist()">
+                        📞 Speak to Specialist
+                    </button>
+                </div>
+
+                <div class="disclaimer">
+                    <p><strong>Disclaimer:</strong> This analysis is based on industry averages and your provided estimates. Actual results may vary based on your specific practice, patient demographics, and local market conditions. TuaPay financing subject to credit approval.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize calculator
+        let calculationData = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to inputs
+            const inputs = ['avgCaseValue', 'casesPerMonth', 'acceptanceIncrease', 'financingUsage', 'paymentTimeline', 'currentRevenue'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', calculateTeaser);
+                }
+            });
+
+            // Handle checkbox for current revenue
+            document.getElementById('includeCurrentRevenue').addEventListener('change', function() {
+                const group = document.getElementById('currentRevenueGroup');
+                if (this.checked) {
+                    group.classList.remove('hidden');
+                } else {
+                    group.classList.add('hidden');
+                }
+                calculateTeaser();
+            });
+
+            // Set default values
+            document.getElementById('avgCaseValue').value = 2500;
+            document.getElementById('casesPerMonth').value = 50;
+            document.getElementById('acceptanceIncrease').value = 25;
+            document.getElementById('financingUsage').value = 40;
+            document.getElementById('paymentTimeline').value = 45;
+            
+            calculateTeaser();
+        });
+
+        function calculateTeaser() {
+            const avgCaseValue = parseFloat(document.getElementById('avgCaseValue').value) || 0;
+            const casesPerMonth = parseFloat(document.getElementById('casesPerMonth').value) || 0;
+            const acceptanceIncrease = parseFloat(document.getElementById('acceptanceIncrease').value) || 0;
+            const financingUsage = parseFloat(document.getElementById('financingUsage').value) || 0;
+
+            // Calculate teaser amount (monthly revenue increase)
+            const additionalClients = Math.round((casesPerMonth * acceptanceIncrease / 100) * (financingUsage / 100));
+            const monthlyIncrease = additionalClients * avgCaseValue;
+
+            // Store for full calculation
+            calculationData = {
+                avgCaseValue,
+                casesPerMonth,
+                acceptanceIncrease,
+                financingUsage,
+                paymentTimeline: parseFloat(document.getElementById('paymentTimeline').value) || 0,
+                currentRevenue: parseFloat(document.getElementById('currentRevenue').value) || 0,
+                includeCurrentRevenue: document.getElementById('includeCurrentRevenue').checked,
+                monthlyIncrease,
+                additionalClients
+            };
+
+            // Update teaser display
+            document.getElementById('teaserAmount').textContent = formatCurrency(monthlyIncrease);
+        }
+
+        function calculateFullResults() {
+            const data = calculationData;
+            
+            // Calculate break-even (assuming 3% processing fee + $299 setup)
+            const monthlyFees = data.monthlyIncrease * 0.03;
+            const setupCost = 299;
+            const breakEvenMonths = monthlyFees > 0 ? Math.ceil(setupCost / monthlyFees) : 0;
+
+            // Calculate payment timeline improvement
+            const tuaPayTimeline = 2; // TuaPay pays practices in 1-2 days
+            const paymentImprovement = Math.max(0, data.paymentTimeline - tuaPayTimeline);
+
+            // Calculate cash flow impact
+            let cashFlowBoost = 0;
+            if (data.includeCurrentRevenue && data.currentRevenue > 0) {
+                const dailyRevenue = data.currentRevenue / 30;
+                cashFlowBoost = dailyRevenue * paymentImprovement;
+            }
+
+            // Calculate annual impact
+            const annualImpact = data.monthlyIncrease * 12;
+
+            // Update displays
+            document.getElementById('monthlyIncrease').textContent = formatCurrency(data.monthlyIncrease);
+            document.getElementById('newPatients').textContent = data.additionalClients;
+            document.getElementById('breakEven').textContent = breakEvenMonths + ' mo';
+            document.getElementById('paymentSpeed').textContent = paymentImprovement + ' days';
+            document.getElementById('cashFlowBoost').textContent = formatCurrency(cashFlowBoost);
+            document.getElementById('annualImpact').textContent = formatCurrency(annualImpact);
+
+            // Show/hide cash flow card
+            if (data.includeCurrentRevenue) {
+                document.getElementById('cashFlowCard').classList.remove('hidden');
+            }
+        }
+
+        // HubSpot Integration
+        async function submitToHubSpot(leadData) {
+            const PORTAL_ID = '24395067'; // Your HubSpot Portal ID
+            const FORM_GUID = 'e8859b1b-322f-4238-bfa3-e2347786a776'; // Your HubSpot Form GUID
+            
+            try {
+                const response = await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_GUID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fields: [
+                            { name: "firstname", value: leadData.firstName },
+                            { name: "lastname", value: leadData.lastName },
+                            { name: "email", value: leadData.email },
+                            { name: "company", value: leadData.practiceName || 'Not Provided' }
+                        ],
+                        context: {
+                            pageUri: window.location.href,
+                            pageName: "TuaPay ROI Calculator"
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('Successfully submitted to HubSpot');
+                    return true;
+                } else {
+                    console.error('HubSpot submission failed:', response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error submitting to HubSpot:', error);
+                return false;
+            }
+        }
+
+        // Email ROI data to sales team
+        async function emailROIData(leadData) {
+            const emailBody = `
+New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}
+
+Contact Info:
+- Email: ${leadData.email}
+- Practice: ${leadData.practiceName || 'Not provided'}
+
+ROI Calculation Results:
+- Monthly Revenue Increase: $${leadData.calculationData.monthlyIncrease.toLocaleString()}
+- Annual Impact: $${(leadData.calculationData.monthlyIncrease * 12).toLocaleString()}
+- Additional Patients/Month: ${leadData.calculationData.additionalClients}
+- Average Case Value: $${leadData.calculationData.avgCaseValue.toLocaleString()}
+- Cases Per Month: ${leadData.calculationData.casesPerMonth}
+- Expected Acceptance Increase: ${leadData.calculationData.acceptanceIncrease}%
+- Financing Usage: ${leadData.calculationData.financingUsage}%
+- Current Payment Timeline: ${leadData.calculationData.paymentTimeline} days
+
+Submitted: ${new Date().toLocaleString()}
+Page: ${window.location.href}
+            `.trim();
+
+            // Using EmailJS - replace with your actual service details
+            try {
+                const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        service_id: 'YOUR_EMAILJS_SERVICE_ID',
+                        template_id: 'YOUR_EMAILJS_TEMPLATE_ID',
+                        user_id: 'YOUR_EMAILJS_PUBLIC_KEY',
+                        template_params: {
+                            to_email: 'sales@tuapay.com', // Your sales team email
+                            subject: `New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}`,
+                            message: emailBody,
+                            from_name: 'TuaPay ROI Calculator'
+                        }
+                    })
+                });
+                
+                console.log('ROI data emailed to sales team');
+            } catch (error) {
+                console.error('Failed to email ROI data:', error);
+            }
+        }
+
+        async function submitForm() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const practiceName = document.getElementById('practiceName').value.trim();
+
+            // Validate required fields
+            if (!firstName || !lastName || !email) {
+                alert('Please fill in all required fields (First Name, Last Name, and Email).');
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            // Show loading state
+            const submitButton = document.querySelector('.submit-button');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            // Store lead data
+            const leadData = {
+                firstName,
+                lastName,
+                email,
+                practiceName,
+                timestamp: new Date().toISOString(),
+                calculationData: calculationData
+            };
+
+            // Submit to HubSpot and email ROI data
+            try {
+                const hubspotSuccess = await submitToHubSpot(leadData);
+                
+                // Also email ROI data to sales team (optional)
+                // await emailROIData(leadData);
+                
+                if (hubspotSuccess) {
+                    showResults(leadData);
+                } else {
+                    console.warn('HubSpot submission failed, but showing results anyway');
+                    showResults(leadData);
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                showResults(leadData);
+            }
+
+            // Reset button
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        }
+
+        function showResults(leadData) {
+            // Update practice name display
+            if (leadData.practiceName) {
+                document.getElementById('practiceNameDisplay').textContent = leadData.practiceName;
+            }
+
+            // Calculate full results
+            calculateFullResults();
+
+            // Hide teaser, show full report
+            document.getElementById('teaserSection').style.display = 'none';
+            document.getElementById('reportSection').style.display = 'block';
+
+            // Scroll to results
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadReport() {
+            // Generate print-friendly version
+            window.print();
+        }
+
+        function contactSpecialist() {
+            // In real implementation, this could open a calendar booking widget
+            alert('Thank you for your interest! A Patient Financing Specialist will contact you within 24 hours.');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+    </script>
+</body>
+</html>
