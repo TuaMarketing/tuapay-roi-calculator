@@ -755,17 +755,20 @@
             }
         }
 
-        // Zapier Webhook Integration
-        async function submitToZapier(leadData) {
-            const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/23364126/u28ko9h/';
+        // Google Sheets Integration (Free & Simple)
+        async function submitToGoogleSheets(leadData) {
+            // Google Apps Script Web App URL
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-TYAnIKgQQO_fevwjOrLe_d9L3dpqTt7T3xyNeDwKl1XoB_SY_AzUKyvCr0NeJKfe/exec';
             
             try {
-                const response = await fetch(ZAPIER_WEBHOOK_URL, {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // Important for Google Apps Script
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        timestamp: new Date().toLocaleString(),
                         firstName: leadData.firstName,
                         lastName: leadData.lastName,
                         email: leadData.email,
@@ -778,21 +781,14 @@
                         acceptanceIncrease: leadData.calculationData.acceptanceIncrease,
                         financingUsage: leadData.calculationData.financingUsage,
                         paymentTimeline: leadData.calculationData.paymentTimeline,
-                        leadSource: 'TuaPay ROI Calculator',
-                        timestamp: new Date().toISOString(),
                         pageUrl: window.location.href
                     })
                 });
-
-                if (response.ok) {
-                    console.log('Successfully submitted to Zapier');
-                    return true;
-                } else {
-                    console.error('Zapier submission failed:', response.statusText);
-                    return false;
-                }
+                
+                console.log('Data sent to Google Sheets');
+                return true;
             } catch (error) {
-                console.error('Error submitting to Zapier:', error);
+                console.error('Error sending to Google Sheets:', error);
                 return false;
             }
         }
@@ -846,6 +842,7 @@ Page: ${window.location.href}
             }
         }
 
+        // Simple Email Capture - sends data to your email
         async function submitForm() {
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
@@ -871,34 +868,53 @@ Page: ${window.location.href}
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;
 
-            // Store lead data
+            // Create email body with all lead data
+            const emailBody = `
+New ROI Calculator Lead:
+
+Contact Information:
+- Name: ${firstName} ${lastName}
+- Email: ${email}
+- Practice: ${practiceName || 'Not provided'}
+
+ROI Calculation Results:
+- Monthly Revenue Increase: ${calculationData.monthlyIncrease.toLocaleString()}
+- Annual Impact: ${(calculationData.monthlyIncrease * 12).toLocaleString()}
+- Additional Patients/Month: ${calculationData.additionalClients}
+- Average Case Value: ${calculationData.avgCaseValue.toLocaleString()}
+- Cases Per Month: ${calculationData.casesPerMonth}
+- Expected Acceptance Increase: ${calculationData.acceptanceIncrease}%
+- Financing Usage: ${calculationData.financingUsage}%
+- Current Payment Timeline: ${calculationData.paymentTimeline} days
+
+Submitted: ${new Date().toLocaleString()}
+Page: ${window.location.href}
+            `.trim();
+
+            // Create mailto link
+            const subject = `New ROI Calculator Lead: ${firstName} ${lastName}`;
+            const mailtoLink = `mailto:leads@tuafinancial.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+
+            // Open email client
+            window.location.href = mailtoLink;
+
+            // Store lead data for results
             const leadData = {
                 firstName,
                 lastName,
                 email,
                 practiceName,
-                timestamp: new Date().toISOString(),
                 calculationData: calculationData
             };
 
-            // Submit to Zapier (which connects to HubSpot)
-            try {
-                const zapierSuccess = await submitToZapier(leadData);
-                
-                if (zapierSuccess) {
-                    showResults(leadData);
-                } else {
-                    console.warn('Zapier submission failed, but showing results anyway');
-                    showResults(leadData);
-                }
-            } catch (error) {
-                console.error('Submission error:', error);
+            // Show results immediately
+            setTimeout(() => {
                 showResults(leadData);
-            }
-
-            // Reset button
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
+                
+                // Reset button
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }, 1000);
         }
 
         function showResults(leadData) {
