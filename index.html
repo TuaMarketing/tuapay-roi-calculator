@@ -755,40 +755,53 @@
             }
         }
 
-        // Google Sheets Integration (Free & Simple)
-        async function submitToGoogleSheets(leadData) {
-            // Google Apps Script Web App URL
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-TYAnIKgQQO_fevwjOrLe_d9L3dpqTt7T3xyNeDwKl1XoB_SY_AzUKyvCr0NeJKfe/exec';
+        // EmailJS Integration - sends emails directly without opening user's email client
+        async function submitToEmailJS(leadData) {
+            // EmailJS configuration
+            const EMAILJS_SERVICE_ID = 'service_n1dih2l';
+            const EMAILJS_TEMPLATE_ID = 'template_lmvtcjo';
+            const EMAILJS_PUBLIC_KEY = 'gQdlk-7oLqf0eJgMX';
             
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                     method: 'POST',
-                    mode: 'no-cors', // Important for Google Apps Script
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        timestamp: new Date().toLocaleString(),
-                        firstName: leadData.firstName,
-                        lastName: leadData.lastName,
-                        email: leadData.email,
-                        practiceName: leadData.practiceName || '',
-                        monthlyIncrease: leadData.calculationData.monthlyIncrease,
-                        annualImpact: leadData.calculationData.monthlyIncrease * 12,
-                        newPatients: leadData.calculationData.additionalClients,
-                        avgCaseValue: leadData.calculationData.avgCaseValue,
-                        casesPerMonth: leadData.calculationData.casesPerMonth,
-                        acceptanceIncrease: leadData.calculationData.acceptanceIncrease,
-                        financingUsage: leadData.calculationData.financingUsage,
-                        paymentTimeline: leadData.calculationData.paymentTimeline,
-                        pageUrl: window.location.href
+                        service_id: EMAILJS_SERVICE_ID,
+                        template_id: EMAILJS_TEMPLATE_ID,
+                        user_id: EMAILJS_PUBLIC_KEY,
+                        template_params: {
+                            to_email: 'marketing@tuafinancial.com', // Your actual email address
+                            subject: `New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}`,
+                            from_name: 'TuaPay ROI Calculator',
+                            lead_name: `${leadData.firstName} ${leadData.lastName}`,
+                            lead_email: leadData.email,
+                            practice_name: leadData.practiceName || 'Not provided',
+                            monthly_increase: leadData.calculationData.monthlyIncrease.toLocaleString(),
+                            annual_impact: (leadData.calculationData.monthlyIncrease * 12).toLocaleString(),
+                            new_patients: leadData.calculationData.additionalClients,
+                            avg_case_value: leadData.calculationData.avgCaseValue.toLocaleString(),
+                            cases_per_month: leadData.calculationData.casesPerMonth,
+                            acceptance_increase: leadData.calculationData.acceptanceIncrease,
+                            financing_usage: leadData.calculationData.financingUsage,
+                            payment_timeline: leadData.calculationData.paymentTimeline,
+                            timestamp: new Date().toLocaleString(),
+                            page_url: window.location.href
+                        }
                     })
                 });
-                
-                console.log('Data sent to Google Sheets');
-                return true;
+
+                if (response.ok) {
+                    console.log('Email sent successfully to TuaFinancial');
+                    return true;
+                } else {
+                    console.error('EmailJS failed:', response.statusText);
+                    return false;
+                }
             } catch (error) {
-                console.error('Error sending to Google Sheets:', error);
+                console.error('Error sending email:', error);
                 return false;
             }
         }
