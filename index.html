@@ -629,12 +629,6 @@
                     </div>
 
                     <div class="result-card">
-                        <div class="result-label">Break-Even Timeline</div>
-                        <div class="result-value" id="breakEven">0 mo</div>
-                        <div class="result-description">Time to recover TuaPay implementation costs</div>
-                    </div>
-
-                    <div class="result-card">
                         <div class="result-label">Payment Acceleration</div>
                         <div class="result-value" id="paymentSpeed">0 days</div>
                         <div class="result-description">Faster cash flow vs. current timeline</div>
@@ -738,11 +732,6 @@
         function calculateFullResults() {
             const data = calculationData;
             
-            // Calculate break-even (assuming 3% processing fee + $299 setup)
-            const monthlyFees = data.monthlyIncrease * 0.03;
-            const setupCost = 299;
-            const breakEvenMonths = monthlyFees > 0 ? Math.ceil(setupCost / monthlyFees) : 0;
-
             // Calculate payment timeline improvement
             const tuaPayTimeline = 2; // TuaPay pays practices in 1-2 days
             const paymentImprovement = Math.max(0, data.paymentTimeline - tuaPayTimeline);
@@ -760,7 +749,6 @@
             // Update displays
             document.getElementById('monthlyIncrease').textContent = formatCurrency(data.monthlyIncrease);
             document.getElementById('newPatients').textContent = data.additionalClients;
-            document.getElementById('breakEven').textContent = breakEvenMonths + ' mo';
             document.getElementById('paymentSpeed').textContent = paymentImprovement + ' days';
             document.getElementById('cashFlowBoost').textContent = formatCurrency(cashFlowBoost);
             document.getElementById('annualImpact').textContent = formatCurrency(annualImpact);
