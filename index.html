@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // Initialize EmailJS
+        emailjs.init('gQdlk-7oLqf0eJgMX');
+    </script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -755,64 +760,38 @@
             }
         }
 
-        // EmailJS Integration - sends emails directly without opening user's email client
+        // EmailJS Integration - Using SDK for better reliability
         async function submitToEmailJS(leadData) {
-            console.log('Starting EmailJS submission...', leadData);
-            
-            // EmailJS configuration
-            const EMAILJS_SERVICE_ID = 'service_n1dih2l';
-            const EMAILJS_TEMPLATE_ID = 'template_lmvtcjo';
-            const EMAILJS_PUBLIC_KEY = 'gQdlk-7oLqf0eJgMX';
+            console.log('Starting EmailJS submission with SDK...', leadData);
             
             try {
-                console.log('Sending to EmailJS with params:', {
-                    service_id: EMAILJS_SERVICE_ID,
-                    template_id: EMAILJS_TEMPLATE_ID,
-                    user_id: EMAILJS_PUBLIC_KEY
-                });
+                const templateParams = {
+                    lead_name: `${leadData.firstName} ${leadData.lastName}`,
+                    lead_email: leadData.email,
+                    practice_name: leadData.practiceName || 'Not provided',
+                    monthly_increase: leadData.calculationData.monthlyIncrease.toLocaleString(),
+                    annual_impact: (leadData.calculationData.monthlyIncrease * 12).toLocaleString(),
+                    new_patients: leadData.calculationData.additionalClients,
+                    avg_case_value: leadData.calculationData.avgCaseValue.toLocaleString(),
+                    cases_per_month: leadData.calculationData.casesPerMonth,
+                    acceptance_increase: leadData.calculationData.acceptanceIncrease,
+                    financing_usage: leadData.calculationData.financingUsage,
+                    payment_timeline: leadData.calculationData.paymentTimeline,
+                    timestamp: new Date().toLocaleString(),
+                    page_url: window.location.href
+                };
 
-                const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        service_id: EMAILJS_SERVICE_ID,
-                        template_id: EMAILJS_TEMPLATE_ID,
-                        user_id: EMAILJS_PUBLIC_KEY,
-                        template_params: {
-                            to_email: 'marketing@tuafinancial.com',
-                            subject: `New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}`,
-                            from_name: 'TuaPay ROI Calculator',
-                            lead_name: `${leadData.firstName} ${leadData.lastName}`,
-                            lead_email: leadData.email,
-                            practice_name: leadData.practiceName || 'Not provided',
-                            monthly_increase: leadData.calculationData.monthlyIncrease.toLocaleString(),
-                            annual_impact: (leadData.calculationData.monthlyIncrease * 12).toLocaleString(),
-                            new_patients: leadData.calculationData.additionalClients,
-                            avg_case_value: leadData.calculationData.avgCaseValue.toLocaleString(),
-                            cases_per_month: leadData.calculationData.casesPerMonth,
-                            acceptance_increase: leadData.calculationData.acceptanceIncrease,
-                            financing_usage: leadData.calculationData.financingUsage,
-                            payment_timeline: leadData.calculationData.paymentTimeline,
-                            timestamp: new Date().toLocaleString(),
-                            page_url: window.location.href
-                        }
-                    })
-                });
+                console.log('Sending email with template params:', templateParams);
 
-                console.log('EmailJS response status:', response.status);
+                const result = await emailjs.send('service_n1dih2l', 'template_lmvtcjo', templateParams);
                 
-                if (response.ok) {
-                    console.log('Email sent successfully to marketing@tuafinancial.com');
-                    return true;
-                } else {
-                    const errorText = await response.text();
-                    console.error('EmailJS failed:', response.status, errorText);
-                    return false;
-                }
+                console.log('EmailJS SUCCESS:', result);
+                alert('Lead submitted successfully! You should see your ROI results now.');
+                return true;
+                
             } catch (error) {
-                console.error('Error sending email via EmailJS:', error);
+                console.error('EmailJS ERROR:', error);
+                alert('Email sending failed, but showing results anyway.');
                 return false;
             }
         }
