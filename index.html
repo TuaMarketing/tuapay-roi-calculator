@@ -647,16 +647,12 @@
                     </div>
                 </div>
 
-                <div class="benchmark-note">
-                    <strong>Note:</strong> Results will vary based on your specific practice, patient demographics, treatment types, and local market conditions. This calculator provides estimates for planning purposes.
-                </div>
-
                 <div class="action-buttons">
                     <button class="action-button download-btn" onclick="downloadReport()">
                         📄 Download Report
                     </button>
                     <button class="action-button cta-btn" onclick="contactSpecialist()">
-                        📞 Speak to Specialist
+                        📞 1-833-882-7701
                     </button>
                 </div>
 
@@ -927,8 +923,8 @@ Page: ${window.location.href}
         }
 
         function contactSpecialist() {
-            // In real implementation, this could open a calendar booking widget
-            alert('Thank you for your interest! A Patient Financing Specialist will contact you within 24 hours.');
+            // Direct phone call link
+            window.location.href = 'tel:+18338827701';
         }
 
         function formatCurrency(amount) {
