@@ -757,12 +757,20 @@
 
         // EmailJS Integration - sends emails directly without opening user's email client
         async function submitToEmailJS(leadData) {
+            console.log('Starting EmailJS submission...', leadData);
+            
             // EmailJS configuration
             const EMAILJS_SERVICE_ID = 'service_n1dih2l';
             const EMAILJS_TEMPLATE_ID = 'template_lmvtcjo';
             const EMAILJS_PUBLIC_KEY = 'gQdlk-7oLqf0eJgMX';
             
             try {
+                console.log('Sending to EmailJS with params:', {
+                    service_id: EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id: EMAILJS_PUBLIC_KEY
+                });
+
                 const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                     method: 'POST',
                     headers: {
@@ -773,7 +781,7 @@
                         template_id: EMAILJS_TEMPLATE_ID,
                         user_id: EMAILJS_PUBLIC_KEY,
                         template_params: {
-                            to_email: 'marketing@tuafinancial.com', // Your actual email address
+                            to_email: 'marketing@tuafinancial.com',
                             subject: `New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}`,
                             from_name: 'TuaPay ROI Calculator',
                             lead_name: `${leadData.firstName} ${leadData.lastName}`,
@@ -793,67 +801,24 @@
                     })
                 });
 
+                console.log('EmailJS response status:', response.status);
+                
                 if (response.ok) {
-                    console.log('Email sent successfully to TuaFinancial');
+                    console.log('Email sent successfully to marketing@tuafinancial.com');
                     return true;
                 } else {
-                    console.error('EmailJS failed:', response.statusText);
+                    const errorText = await response.text();
+                    console.error('EmailJS failed:', response.status, errorText);
                     return false;
                 }
             } catch (error) {
-                console.error('Error sending email:', error);
+                console.error('Error sending email via EmailJS:', error);
                 return false;
             }
         }
 
-        // Email ROI data to sales team
-        async function emailROIData(leadData) {
-            const emailBody = `
-New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}
-
-Contact Info:
-- Email: ${leadData.email}
-- Practice: ${leadData.practiceName || 'Not provided'}
-
-ROI Calculation Results:
-- Monthly Revenue Increase: $${leadData.calculationData.monthlyIncrease.toLocaleString()}
-- Annual Impact: $${(leadData.calculationData.monthlyIncrease * 12).toLocaleString()}
-- Additional Patients/Month: ${leadData.calculationData.additionalClients}
-- Average Case Value: $${leadData.calculationData.avgCaseValue.toLocaleString()}
-- Cases Per Month: ${leadData.calculationData.casesPerMonth}
-- Expected Acceptance Increase: ${leadData.calculationData.acceptanceIncrease}%
-- Financing Usage: ${leadData.calculationData.financingUsage}%
-- Current Payment Timeline: ${leadData.calculationData.paymentTimeline} days
-
-Submitted: ${new Date().toLocaleString()}
-Page: ${window.location.href}
-            `.trim();
-
-            // Using EmailJS - replace with your actual service details
-            try {
-                const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        service_id: 'YOUR_EMAILJS_SERVICE_ID',
-                        template_id: 'YOUR_EMAILJS_TEMPLATE_ID',
-                        user_id: 'YOUR_EMAILJS_PUBLIC_KEY',
-                        template_params: {
-                            to_email: 'sales@tuapay.com', // Your sales team email
-                            subject: `New ROI Calculator Lead: ${leadData.firstName} ${leadData.lastName}`,
-                            message: emailBody,
-                            from_name: 'TuaPay ROI Calculator'
-                        }
-                    })
-                });
-                
-                console.log('ROI data emailed to sales team');
-            } catch (error) {
-                console.error('Failed to email ROI data:', error);
-            }
-        }
+        // Email ROI data to sales team (REMOVED - using EmailJS instead)
+        // This function has been replaced with submitToEmailJS
 
         // Simple Email Capture - sends data to your email
         async function submitForm() {
