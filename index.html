@@ -755,40 +755,44 @@
             }
         }
 
-        // HubSpot Integration
-        async function submitToHubSpot(leadData) {
-            const PORTAL_ID = '24395067'; // Your HubSpot Portal ID
-            const FORM_GUID = 'e8859b1b-322f-4238-bfa3-e2347786a776'; // Your HubSpot Form GUID
+        // Zapier Webhook Integration
+        async function submitToZapier(leadData) {
+            const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/23364126/u28ko9h/';
             
             try {
-                const response = await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${PORTAL_ID}/${FORM_GUID}`, {
+                const response = await fetch(ZAPIER_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        fields: [
-                            { name: "firstname", value: leadData.firstName },
-                            { name: "lastname", value: leadData.lastName },
-                            { name: "email", value: leadData.email },
-                            { name: "company", value: leadData.practiceName || 'Not Provided' }
-                        ],
-                        context: {
-                            pageUri: window.location.href,
-                            pageName: "TuaPay ROI Calculator"
-                        }
+                        firstName: leadData.firstName,
+                        lastName: leadData.lastName,
+                        email: leadData.email,
+                        practiceName: leadData.practiceName || '',
+                        monthlyIncrease: leadData.calculationData.monthlyIncrease,
+                        annualImpact: leadData.calculationData.monthlyIncrease * 12,
+                        newPatients: leadData.calculationData.additionalClients,
+                        avgCaseValue: leadData.calculationData.avgCaseValue,
+                        casesPerMonth: leadData.calculationData.casesPerMonth,
+                        acceptanceIncrease: leadData.calculationData.acceptanceIncrease,
+                        financingUsage: leadData.calculationData.financingUsage,
+                        paymentTimeline: leadData.calculationData.paymentTimeline,
+                        leadSource: 'TuaPay ROI Calculator',
+                        timestamp: new Date().toISOString(),
+                        pageUrl: window.location.href
                     })
                 });
 
                 if (response.ok) {
-                    console.log('Successfully submitted to HubSpot');
+                    console.log('Successfully submitted to Zapier');
                     return true;
                 } else {
-                    console.error('HubSpot submission failed:', response.statusText);
+                    console.error('Zapier submission failed:', response.statusText);
                     return false;
                 }
             } catch (error) {
-                console.error('Error submitting to HubSpot:', error);
+                console.error('Error submitting to Zapier:', error);
                 return false;
             }
         }
@@ -877,17 +881,14 @@ Page: ${window.location.href}
                 calculationData: calculationData
             };
 
-            // Submit to HubSpot and email ROI data
+            // Submit to Zapier (which connects to HubSpot)
             try {
-                const hubspotSuccess = await submitToHubSpot(leadData);
+                const zapierSuccess = await submitToZapier(leadData);
                 
-                // Also email ROI data to sales team (optional)
-                // await emailROIData(leadData);
-                
-                if (hubspotSuccess) {
+                if (zapierSuccess) {
                     showResults(leadData);
                 } else {
-                    console.warn('HubSpot submission failed, but showing results anyway');
+                    console.warn('Zapier submission failed, but showing results anyway');
                     showResults(leadData);
                 }
             } catch (error) {
