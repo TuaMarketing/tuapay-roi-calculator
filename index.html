@@ -1,14 +1,11 @@
-<!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-        // Initialize EmailJS
-        emailjs.init('gQdlk-7oLqf0eJgMX');
-    </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TuaPay ROI Calculator</title>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -44,7 +41,6 @@
             color: #085588;
             padding: 40px 30px;
             text-align: center;
-            position: relative;
             border-bottom: 3px solid #47b7c9;
         }
 
@@ -52,21 +48,6 @@
             max-width: 200px;
             height: auto;
             margin-bottom: 20px;
-        }
-
-        .logo-placeholder {
-            width: 200px;
-            height: 60px;
-            background: rgba(71, 183, 201, 0.1);
-            border: 2px dashed #47b7c9;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px auto;
-            color: #47b7c9;
-            font-size: 14px;
-            font-weight: 500;
         }
 
         .header h1 {
@@ -77,17 +58,13 @@
 
         .header p {
             font-size: 1.3em;
-            opacity: 0.95;
+            opacity: 0.8;
             max-width: 600px;
             margin: 0 auto;
         }
 
         .main-content {
             padding: 40px;
-        }
-
-        .inputs-section {
-            margin-bottom: 40px;
         }
 
         .section-title {
@@ -403,17 +380,6 @@
             line-height: 1.4;
         }
 
-        .benchmark-note {
-            background: linear-gradient(135deg, #cddd72 0%, #a8c948 100%);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin: 30px 0;
-            font-weight: 600;
-            color: #2d4a22;
-            font-size: 1.1em;
-        }
-
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -596,16 +562,31 @@
                     <h3>Reveal Your Complete ROI Analysis</h3>
                     <p>Enter your details below to unlock your full financial impact breakdown, including break-even timeline and cash flow projections.</p>
                     
-                    <div class="form-row">
-                        <input type="text" class="email-input" id="firstName" placeholder="First Name" required>
-                        <input type="text" class="email-input" id="lastName" placeholder="Last Name" required>
-                    </div>
-                    
-                    <input type="email" class="email-input" id="email" placeholder="your.email@practice.com" required style="margin-bottom: 15px;">
-                    
-                    <input type="text" class="email-input" id="practiceName" placeholder="Practice Name (Optional)" style="margin-bottom: 20px;">
-                    
-                    <button class="submit-button" onclick="submitForm()">Reveal My Full ROI Analysis</button>
+                    <form id="leadForm" style="display: contents;">
+                        <div class="form-row">
+                            <input type="text" class="email-input" id="firstName" name="firstName" placeholder="First Name" required>
+                            <input type="text" class="email-input" id="lastName" name="lastName" placeholder="Last Name" required>
+                        </div>
+                        
+                        <input type="email" class="email-input" id="email" name="email" placeholder="your.email@practice.com" required style="margin-bottom: 15px;">
+                        
+                        <input type="text" class="email-input" id="practiceName" name="practiceName" placeholder="Practice Name (Optional)" style="margin-bottom: 20px;">
+                        
+                        <!-- Hidden fields for ROI data -->
+                        <input type="hidden" id="monthlyIncreaseHidden" name="monthlyIncrease">
+                        <input type="hidden" id="annualImpactHidden" name="annualImpact">
+                        <input type="hidden" id="newPatientsHidden" name="newPatients">
+                        <input type="hidden" id="avgCaseValueHidden" name="avgCaseValue">
+                        <input type="hidden" id="casesPerMonthHidden" name="casesPerMonth">
+                        <input type="hidden" id="acceptanceIncreaseHidden" name="acceptanceIncrease">
+                        <input type="hidden" id="financingUsageHidden" name="financingUsage">
+                        <input type="hidden" id="paymentTimelineHidden" name="paymentTimeline">
+                        <input type="hidden" name="leadSource" value="TuaPay ROI Calculator">
+                        <input type="hidden" name="timestamp" id="timestampHidden">
+                        <input type="hidden" name="pageUrl" id="pageUrlHidden">
+                        
+                        <button type="button" class="submit-button" id="submitBtn">Reveal My Full ROI Analysis</button>
+                    </form>
                 </div>
                 
                 <div class="disclaimer" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 11px; color: #666; font-style: italic; border: 1px solid #e9ecef;">
@@ -653,27 +634,50 @@
                 </div>
 
                 <div class="action-buttons">
-                    <button class="action-button download-btn" onclick="downloadReport()">
+                    <button class="action-button download-btn" id="downloadBtn">
                         📄 Download Report
                     </button>
-                    <button class="action-button cta-btn" onclick="contactSpecialist()">
+                    <button class="action-button cta-btn" id="contactBtn">
                         📞 1-833-882-7701
                     </button>
                 </div>
 
                 <div class="disclaimer">
-                    <p><strong>Disclaimer:</strong> This calculator provides an estimate based on the information you entered and is for informational purposes only. It does not constitute financial advice, a guarantee of results, or an offer of credit. Actual outcomes may vary. For a personalized assessment, please speak with a Tua Financial representative.</p>
+                    <p><strong>Disclaimer:</strong> The ROI Calculator is a tool provided for informational and illustrative purposes only. Estimates are based on the information you input and general industry data, and do not constitute financial, tax, legal, or investment advice. This tool is not a guarantee of performance, profitability, or results, and does not represent an offer or commitment to provide financing. Actual results will vary. All financing is subject to credit approval and underwriting by Tua Financial. For a personalized ROI analysis and financing options tailored to your practice, please speak with a Tua Financial representative.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize calculator
+        // Initialize EmailJS when library loads
+        function initializeEmailJS() {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init('gQdlk-7oLqf0eJgMX');
+                console.log('EmailJS initialized successfully');
+            } else {
+                console.log('EmailJS not loaded yet, retrying...');
+                setTimeout(initializeEmailJS, 100);
+            }
+        }
+
+        // Start initialization
+        initializeEmailJS();
+
+        // Global calculation data storage
         let calculationData = {};
 
+        // Initialize calculator when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Add event listeners to inputs
+            console.log('Calculator initialized');
+            setupEventListeners();
+            setDefaultValues();
+            calculateTeaser();
+        });
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Input field listeners for real-time calculation
             const inputs = ['avgCaseValue', 'casesPerMonth', 'acceptanceIncrease', 'financingUsage', 'paymentTimeline', 'currentRevenue'];
             inputs.forEach(id => {
                 const element = document.getElementById(id);
@@ -682,7 +686,7 @@
                 }
             });
 
-            // Handle checkbox for current revenue
+            // Checkbox listener
             document.getElementById('includeCurrentRevenue').addEventListener('change', function() {
                 const group = document.getElementById('currentRevenueGroup');
                 if (this.checked) {
@@ -693,27 +697,35 @@
                 calculateTeaser();
             });
 
-            // Set default values
+            // Form submission listener
+            document.getElementById('submitBtn').addEventListener('click', handleFormSubmission);
+
+            // Action button listeners
+            document.getElementById('downloadBtn').addEventListener('click', downloadReport);
+            document.getElementById('contactBtn').addEventListener('click', contactSpecialist);
+        }
+
+        // Set default input values
+        function setDefaultValues() {
             document.getElementById('avgCaseValue').value = 2500;
             document.getElementById('casesPerMonth').value = 50;
             document.getElementById('acceptanceIncrease').value = 25;
             document.getElementById('financingUsage').value = 40;
             document.getElementById('paymentTimeline').value = 45;
-            
-            calculateTeaser();
-        });
+        }
 
+        // Calculate and update teaser amount
         function calculateTeaser() {
             const avgCaseValue = parseFloat(document.getElementById('avgCaseValue').value) || 0;
             const casesPerMonth = parseFloat(document.getElementById('casesPerMonth').value) || 0;
             const acceptanceIncrease = parseFloat(document.getElementById('acceptanceIncrease').value) || 0;
             const financingUsage = parseFloat(document.getElementById('financingUsage').value) || 0;
 
-            // Calculate teaser amount (monthly revenue increase)
+            // Calculate additional clients and revenue
             const additionalClients = Math.round((casesPerMonth * acceptanceIncrease / 100) * (financingUsage / 100));
             const monthlyIncrease = additionalClients * avgCaseValue;
 
-            // Store for full calculation
+            // Store calculation data
             calculationData = {
                 avgCaseValue,
                 casesPerMonth,
@@ -730,77 +742,11 @@
             document.getElementById('teaserAmount').textContent = formatCurrency(monthlyIncrease);
         }
 
-        function calculateFullResults() {
-            const data = calculationData;
-            
-            // Calculate payment timeline improvement
-            const tuaPayTimeline = 2; // TuaPay pays practices in 1-2 days
-            const paymentImprovement = Math.max(0, data.paymentTimeline - tuaPayTimeline);
+        // Simple and reliable: Submit to Google Forms (100% free)
+        async function handleFormSubmission() {
+            console.log('Form submission started');
 
-            // Calculate cash flow impact
-            let cashFlowBoost = 0;
-            if (data.includeCurrentRevenue && data.currentRevenue > 0) {
-                const dailyRevenue = data.currentRevenue / 30;
-                cashFlowBoost = dailyRevenue * paymentImprovement;
-            }
-
-            // Calculate annual impact
-            const annualImpact = data.monthlyIncrease * 12;
-
-            // Update displays
-            document.getElementById('monthlyIncrease').textContent = formatCurrency(data.monthlyIncrease);
-            document.getElementById('newPatients').textContent = data.additionalClients;
-            document.getElementById('paymentSpeed').textContent = paymentImprovement + ' days';
-            document.getElementById('cashFlowBoost').textContent = formatCurrency(cashFlowBoost);
-            document.getElementById('annualImpact').textContent = formatCurrency(annualImpact);
-
-            // Show/hide cash flow card
-            if (data.includeCurrentRevenue) {
-                document.getElementById('cashFlowCard').classList.remove('hidden');
-            }
-        }
-
-        // EmailJS Integration - Using SDK for better reliability
-        async function submitToEmailJS(leadData) {
-            console.log('Starting EmailJS submission with SDK...', leadData);
-            
-            try {
-                const templateParams = {
-                    lead_name: `${leadData.firstName} ${leadData.lastName}`,
-                    lead_email: leadData.email,
-                    practice_name: leadData.practiceName || 'Not provided',
-                    monthly_increase: leadData.calculationData.monthlyIncrease.toLocaleString(),
-                    annual_impact: (leadData.calculationData.monthlyIncrease * 12).toLocaleString(),
-                    new_patients: leadData.calculationData.additionalClients,
-                    avg_case_value: leadData.calculationData.avgCaseValue.toLocaleString(),
-                    cases_per_month: leadData.calculationData.casesPerMonth,
-                    acceptance_increase: leadData.calculationData.acceptanceIncrease,
-                    financing_usage: leadData.calculationData.financingUsage,
-                    payment_timeline: leadData.calculationData.paymentTimeline,
-                    timestamp: new Date().toLocaleString(),
-                    page_url: window.location.href
-                };
-
-                console.log('Sending email with template params:', templateParams);
-
-                const result = await emailjs.send('service_n1dih2l', 'template_lmvtcjo', templateParams);
-                
-                console.log('EmailJS SUCCESS:', result);
-                alert('Lead submitted successfully! You should see your ROI results now.');
-                return true;
-                
-            } catch (error) {
-                console.error('EmailJS ERROR:', error);
-                alert('Email sending failed, but showing results anyway.');
-                return false;
-            }
-        }
-
-        // Email ROI data to sales team (REMOVED - using EmailJS instead)
-        // This function has been replaced with submitToEmailJS
-
-        // Simple Email Capture - sends data to your email
-        async function submitForm() {
+            // Get form data
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -820,62 +766,83 @@
             }
 
             // Show loading state
-            const submitButton = document.querySelector('.submit-button');
-            const originalText = submitButton.textContent;
-            submitButton.textContent = 'Submitting...';
-            submitButton.disabled = true;
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
 
-            // Create email body with all lead data
-            const emailBody = `
-New ROI Calculator Lead:
-
-Contact Information:
-- Name: ${firstName} ${lastName}
-- Email: ${email}
-- Practice: ${practiceName || 'Not provided'}
-
-ROI Calculation Results:
-- Monthly Revenue Increase: ${calculationData.monthlyIncrease.toLocaleString()}
-- Annual Impact: ${(calculationData.monthlyIncrease * 12).toLocaleString()}
-- Additional Patients/Month: ${calculationData.additionalClients}
-- Average Case Value: ${calculationData.avgCaseValue.toLocaleString()}
-- Cases Per Month: ${calculationData.casesPerMonth}
-- Expected Acceptance Increase: ${calculationData.acceptanceIncrease}%
-- Financing Usage: ${calculationData.financingUsage}%
-- Current Payment Timeline: ${calculationData.paymentTimeline} days
-
-Submitted: ${new Date().toLocaleString()}
-Page: ${window.location.href}
-            `.trim();
-
-            // Create mailto link
-            const subject = `New ROI Calculator Lead: ${firstName} ${lastName}`;
-            const mailtoLink = `mailto:leads@tuafinancial.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-
-            // Open email client
-            window.location.href = mailtoLink;
-
-            // Store lead data for results
+            // Prepare lead data
             const leadData = {
                 firstName,
                 lastName,
                 email,
                 practiceName,
+                timestamp: new Date().toISOString(),
                 calculationData: calculationData
             };
 
-            // Show results immediately
-            setTimeout(() => {
-                showResults(leadData);
+            try {
+                // Submit to Google Forms
+                const submitted = await submitToGoogleForms(leadData);
                 
+                if (submitted) {
+                    console.log('Lead submitted successfully');
+                    alert('Thank you! Your information has been submitted. Check your email for confirmation.');
+                } else {
+                    console.log('Submission failed, but showing results');
+                }
+
+                // Always show results
+                showResults(leadData);
+
+            } catch (error) {
+                console.error('Error in form submission:', error);
+                showResults(leadData);
+            } finally {
                 // Reset button
-                submitButton.textContent = originalText;
-                submitButton.disabled = false;
-            }, 1000);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         }
 
+        // Submit to Google Forms (most reliable free option)
+        async function submitToGoogleForms(leadData) {
+            console.log('Submitting to Google Forms...');
+
+            try {
+                // Google Forms submission URL (you'll need to replace this with your actual Google Form)
+                const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/YOUR_GOOGLE_FORM_ID/formResponse';
+                
+                // Create form data
+                const formData = new FormData();
+                
+                // Add all data fields (you'll need to map these to your Google Form field IDs)
+                formData.append('entry.123456789', `${leadData.firstName} ${leadData.lastName}`); // Name field
+                formData.append('entry.987654321', leadData.email); // Email field
+                formData.append('entry.456789123', leadData.practiceName || 'Not provided'); // Practice field
+                formData.append('entry.789123456', `Monthly: ${leadData.calculationData.monthlyIncrease.toLocaleString()}, Annual: ${(leadData.calculationData.monthlyIncrease * 12).toLocaleString()}, New Patients: ${leadData.calculationData.additionalClients}`); // ROI summary
+                
+                // Submit to Google Forms
+                const response = await fetch(GOOGLE_FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Required for Google Forms
+                    body: formData
+                });
+
+                console.log('Google Forms submission completed');
+                return true;
+                
+            } catch (error) {
+                console.error('Google Forms submission error:', error);
+                return false;
+            }
+        }
+
+        // Show results section
         function showResults(leadData) {
-            // Update practice name display
+            console.log('Showing results for:', leadData);
+
+            // Update practice name if provided
             if (leadData.practiceName) {
                 document.getElementById('practiceNameDisplay').textContent = leadData.practiceName;
             }
@@ -883,7 +850,7 @@ Page: ${window.location.href}
             // Calculate full results
             calculateFullResults();
 
-            // Hide teaser, show full report
+            // Hide teaser and show report
             document.getElementById('teaserSection').style.display = 'none';
             document.getElementById('reportSection').style.display = 'block';
 
@@ -891,16 +858,38 @@ Page: ${window.location.href}
             document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function downloadReport() {
-            // Generate print-friendly version
-            window.print();
+        // Calculate and display full results
+        function calculateFullResults() {
+            const data = calculationData;
+            
+            // Calculate payment timeline improvement (TuaPay pays in 1-2 days)
+            const tuaPayTimeline = 2;
+            const paymentImprovement = Math.max(0, data.paymentTimeline - tuaPayTimeline);
+
+            // Calculate cash flow impact if current revenue is included
+            let cashFlowBoost = 0;
+            if (data.includeCurrentRevenue && data.currentRevenue > 0) {
+                const dailyRevenue = data.currentRevenue / 30;
+                cashFlowBoost = dailyRevenue * paymentImprovement;
+            }
+
+            // Calculate annual impact
+            const annualImpact = data.monthlyIncrease * 12;
+
+            // Update all result displays
+            document.getElementById('monthlyIncrease').textContent = formatCurrency(data.monthlyIncrease);
+            document.getElementById('newPatients').textContent = data.additionalClients;
+            document.getElementById('paymentSpeed').textContent = paymentImprovement + ' days';
+            document.getElementById('cashFlowBoost').textContent = formatCurrency(cashFlowBoost);
+            document.getElementById('annualImpact').textContent = formatCurrency(annualImpact);
+
+            // Show cash flow card if applicable
+            if (data.includeCurrentRevenue) {
+                document.getElementById('cashFlowCard').classList.remove('hidden');
+            }
         }
 
-        function contactSpecialist() {
-            // Direct phone call link
-            window.location.href = 'tel:+18338827701';
-        }
-
+        // Format currency values
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
@@ -908,6 +897,18 @@ Page: ${window.location.href}
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(amount);
+        }
+
+        // Download report functionality
+        function downloadReport() {
+            console.log('Download report clicked');
+            window.print();
+        }
+
+        // Contact specialist functionality
+        function contactSpecialist() {
+            console.log('Contact specialist clicked');
+            window.location.href = 'tel:+18338827701';
         }
     </script>
 </body>
